@@ -1,6 +1,7 @@
 from flask import Flask
-from .extensions import db;
-from .commands import create_tables;
+from flask_test.extensions import db;
+from flask_test.commands import create_tables;
+from flask_test.models import User
 
 def create_app(cfg='Settings.py'):
     app = Flask(__name__)
@@ -15,7 +16,16 @@ def create_app(cfg='Settings.py'):
     def hello():
         return 'hello'
 
-    # @app.route('/<name>/<pass>')
-    # def add_user(name, pass):
+    @app.route('/<name>/<passw>')
+    def add_user(name, passw):
+        user = User(name = name, password = passw)
+        db.session.add(user)
+        db.session.commit()
+        return 'success'
+    
+    @app.route('/users')
+    def list_users():
+        users = User.query.filter().all()
+        return '\n'.join(map(lambda x: f'name: {x.name}', users))
 
     return app
